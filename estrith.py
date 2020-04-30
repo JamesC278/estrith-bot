@@ -28,7 +28,7 @@ class MyClient(commands.Bot):
         self.start_time = time.time()
         self.recent = [0 for x in range(7)]
         self.messages = ["Yet another round with nothing interesting happening.", "Soon we'll be home eating red meat and combing innards from our hair.", "Time to do my rounds, I suppose.", "If that smuggler is sneaking about again, I'll have his head on a rusty pike.", "Hey you! I've got my eyes on you. You better not try any funny business around here.", "Oh look! Some rocks! Oh, and some more rocks! It can't get more exciting than this.", "I've got the eyes of a hawk, the ears of a wolf, the speed of a kyatt and an awful day job.", "If I never see another floating eyeball in a hundred years, it'll be too soon."]
-        #self.bg_task = self.loop.create_task(self.background_loop())
+        self.bg_task = self.loop.create_task(self.background_loop())
         # Load cogs
         for file in os.listdir("./cogs"):
             try:
@@ -52,7 +52,7 @@ class MyClient(commands.Bot):
             self.recent.pop(0)
             self.recent.append(quote)
             await channel.send(quote)
-            await asyncio.sleep(3600)
+            await asyncio.sleep(random.randint(3600, 18000))
 
     async def on_command(self, ctx):
         """Count number of commands used"""
