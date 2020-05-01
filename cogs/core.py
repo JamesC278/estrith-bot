@@ -32,7 +32,7 @@ class Core(commands.Cog):
     async def uptime_command(self, ctx):
         """Shows the total uptime of the bot"""
         if await ctx.bot.is_owner(ctx.author):
-            emoji = "<:online:705020914013831215>"
+            emoji = "<:online:705690474882793473>"
             await ctx.send(f"{emoji} {await ctx.bot.uptime()}")
 
 def setup(bot):
