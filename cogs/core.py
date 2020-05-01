@@ -12,6 +12,7 @@ class Core(commands.Cog):
             messages = [f"Hey {message.author.mention}! I've got my eyes on you. You better not try any funny business around here.", "Time to do my rounds, I suppose."]
             await message.channel.send(random.choice(messages))
             await message.add_reaction('👀') # :eyes:
+            
     # Commands
     @commands.command(name="invite", aliases=["inv"])
     async def permanent_invite_command(self, ctx):
