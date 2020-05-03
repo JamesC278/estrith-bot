@@ -108,10 +108,10 @@ class MyClient(commands.Bot):
                         if file.endswith(".py"):
                             self.bot.unload_extension(f"cogs.{file[:-3]}")
                             self.bot.load_extension(f"cogs.{file[:-3]}")
-                            text += f"Loaded: {file}.\n"
+                            text += f"Loaded: {file}\n"
                     except Exception as e:
                         print(e)
-                        text += f"Failed to load extension {file}.\n"
+                        text += f"Failed to load extension {file}\n"
                 await self.send(text)
             else:
                 try:
