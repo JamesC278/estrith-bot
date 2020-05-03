@@ -11,6 +11,7 @@ token = open("data/token/token.txt", "r").readline()
 description = """
 I hate my life.
 """
+
 class MyClient(commands.Bot):
     def __init__(self):
         # Initialise bot
@@ -45,6 +46,7 @@ class MyClient(commands.Bot):
     async def background_loop(self):
         await self.wait_until_ready()
         while not self.is_closed():
+            await asyncio.sleep(random.randint(3600, 86400))
             channel = self.get_channel(683818756522115084)
             quote = random.choice(self.messages)
             while quote in self.recent:
@@ -52,7 +54,6 @@ class MyClient(commands.Bot):
             self.recent.pop(0)
             self.recent.append(quote)
             await channel.send(quote)
-            await asyncio.sleep(random.randint(3600, 18000))
 
     async def on_command(self, ctx):
         """Count number of commands used"""
@@ -68,12 +69,6 @@ class MyClient(commands.Bot):
             if isinstance(error, MissingRole) or isinstance(error, MissingAnyRole):
                 await ctx.send("You do not have permission to use that command here.")
             raise error
-
-    async def is_admin(self, member: discord.Member):
-        isAdmin = False
-        for role in member.roles:
-            isAdmin = True if role.id in self.adminRoles else isAdmin
-        return isAdmin
 
     async def uptime(self):
         current_time = time.time()

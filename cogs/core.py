@@ -4,15 +4,24 @@ from discord.ext import commands
 class Core(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.last_sent = f""
 
     # Events
     @commands.Cog.listener()
     async def on_message(self, message):
-        if self.bot.user.mentioned_in(message) and message.mention_everyone is False:
-            messages = [f"Hey {message.author.mention}! I've got my eyes on you. You better not try any funny business around here.", "Time to do my rounds, I suppose."]
-            await message.channel.send(random.choice(messages))
-            await message.add_reaction('👀') # :eyes:
-            
+        if (self.bot.user.mentioned_in(message)
+            and message.mention_everyone is False):
+            if "I've got my eyes" in self.last_sent:
+                text = "Time to do my rounds, I suppose."
+                self.last_sent = text
+                await message.channel.send(text)
+            else:
+                text = f"Hey {message.author.mention}! I've got my eyes on you. You better not try any funny business around here."
+                self.last_sent = text
+                await message.channel.send(text)
+            await message.add_reaction('👀')
+
+
     # Commands
     @commands.command(name="invite", aliases=["inv"])
     async def permanent_invite_command(self, ctx):
@@ -32,7 +41,7 @@ class Core(commands.Cog):
     @commands.command(name="uptime", aliases=["up"])
     async def uptime_command(self, ctx):
         """Shows the total uptime of the bot"""
-        await ctx.send(f"<:online:705690474882793473> {await ctx.bot.uptime()}")
+        await ctx.send(f"<:online:705690474882793473> I've been hating my life for: {await ctx.bot.uptime()}")
 
 def setup(bot):
     bot.add_cog(Core(bot))
