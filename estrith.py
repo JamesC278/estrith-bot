@@ -28,7 +28,21 @@ class MyClient(commands.Bot):
         self.commands_used = 0
         self.start_time = time.time()
         self.recent = [0 for x in range(7)]
-        self.messages = ["Yet another round with nothing interesting happening.", "Soon we'll be home eating red meat and combing innards from our hair.", "Time to do my rounds, I suppose.", "If that smuggler is sneaking about again, I'll have his head on a rusty pike.", "Hey you! I've got my eyes on you. You better not try any funny business around here.", "Oh look! Some rocks! Oh, and some more rocks! It can't get more exciting than this.", "I've got the eyes of a hawk, the ears of a wolf, the speed of a kyatt and an awful day job.", "If I never see another floating eyeball in a hundred years, it'll be too soon."]
+        self.messages = [
+            f"Yet another round with nothing interesting happening.",
+            (f"Soon we'll be home eating red meat and combing innards "
+            f"from our hair.", "Time to do my rounds, I suppose."),
+            (f"If that smuggler is sneaking about again, I'll have his "
+            f"head on a rusty pike."),
+            (f"Hey you! I've got my eyes on you. "
+            f"You better not try any funny business around here."),
+            (f"Oh look! Some rocks! Oh, and some more rocks! "
+            f"It can't get more exciting than this."),
+            (f"I've got the eyes of a hawk, the ears of a wolf, "
+            f"the speed of a kyatt and an awful day job."),
+            (f"If I never see another floating eyeball in a hundred years, "
+            f"it'll be too soon.")
+        ]
         self.bg_task = self.loop.create_task(self.background_loop())
         # Load cogs
         for file in os.listdir("./cogs"):
@@ -41,12 +55,23 @@ class MyClient(commands.Bot):
 
     async def on_ready(self):
         print(f"Online.\nUsername: {self.user.name}\nID: {self.user.id}\n{'-'*27}")
-        await self.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="for rusty pikes"))
+        await self.change_presence(
+            activity=discord.Activity(
+                type=discord.ActivityType.watching,
+                name="for rusty pikes"
+            )
+        )
 
     async def background_loop(self):
         await self.wait_until_ready()
         while not self.is_closed():
-            await asyncio.sleep(random.randint(3600, 86400))
+            time = random.randint(3600, 86400)
+            m, s = divmod(time, 60)
+            h, m = divmod(m, 60)
+            owner = self.get_user(self.owner_id)
+            await owner.send((f"Next message will be sent in:\n"
+                f"{h:d} hours, {m:02d} minutes, {s:02d} seconds"))
+            await asyncio.sleep(time)
             channel = self.get_channel(683818756522115084)
             quote = random.choice(self.messages)
             while quote in self.recent:
@@ -61,7 +86,8 @@ class MyClient(commands.Bot):
 
     async def on_command_error(self, ctx, error):
         """Handle error on commands"""
-        if await ctx.bot.is_owner(ctx.author) or ctx.channel.id in self.allowed_channels:
+        if (await ctx.bot.is_owner(ctx.author)
+            or ctx.channel.id in self.allowed_channels):
             if isinstance(error, CommandNotFound):
                 await ctx.send("That command didn't work. Please try `+help` for all available commands.")
             raise error
@@ -71,8 +97,19 @@ class MyClient(commands.Bot):
             raise error
 
     async def uptime(self):
-        current_time = time.time()
-        return str(datetime.timedelta(seconds=(int(round(current_time - self.start_time)))))
+        print(time.time())
+        uptime = time.time() - self.start_time
+        days = uptime // (24 * 3600)
+        uptime = uptime % (24 * 3600)
+        hours = uptime // 3600
+        uptime %= 3600
+        minutes = uptime // 60
+        uptime %= 60
+        seconds = uptime
+        if days > 0:
+            return f"{int(days)} days, {int(hours)} hours, {int(minutes)} minutes, {int(seconds)} seconds"
+        else:
+            return f"{int(hours)} hours, {int(minutes)} minutes, {int(seconds)} seconds"
 
     # Commands
     @commands.command(name="load", hidden=True)
