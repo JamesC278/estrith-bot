@@ -65,7 +65,7 @@ class MyClient(commands.Bot):
     async def background_loop(self):
         await self.wait_until_ready()
         while not self.is_closed():
-            time = random.randint(3600, 86400)
+            time = random.randint(7200, 86400)
             m, s = divmod(time, 60)
             h, m = divmod(m, 60)
             owner = self.get_user(self.owner_id)
@@ -97,7 +97,6 @@ class MyClient(commands.Bot):
             raise error
 
     async def uptime(self):
-        print(time.time())
         uptime = time.time() - self.start_time
         days = uptime // (24 * 3600)
         uptime = uptime % (24 * 3600)
