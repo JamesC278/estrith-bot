@@ -27,6 +27,8 @@ class MyClient(commands.Bot):
         # Set up attributes
         self.commands_used = 0
         self.start_time = time.time()
+        self.min_time = 7200
+        self.max_time = 86400
         self.recent = [0 for x in range(7)]
         self.messages = [
             f"Yet another round with nothing interesting happening.",
@@ -54,7 +56,9 @@ class MyClient(commands.Bot):
                 print(f"Failed to load extension {file}.")
 
     async def on_ready(self):
-        print(f"Online.\nUsername: {self.user.name}\nID: {self.user.id}\n{'-'*27}")
+        print((f"Online.\n"
+            f"Username: {self.user.name}\n"
+            f"ID: {self.user.id}\n{'-'*27}"))
         await self.change_presence(
             activity=discord.Activity(
                 type=discord.ActivityType.watching,
@@ -65,7 +69,7 @@ class MyClient(commands.Bot):
     async def background_loop(self):
         await self.wait_until_ready()
         while not self.is_closed():
-            time = random.randint(7200, 86400)
+            time = random.randint(self.min_time, self.max_time)
             m, s = divmod(time, 60)
             h, m = divmod(m, 60)
             owner = self.get_user(self.owner_id)
@@ -86,14 +90,17 @@ class MyClient(commands.Bot):
 
     async def on_command_error(self, ctx, error):
         """Handle error on commands"""
-        if (await ctx.bot.is_owner(ctx.author)
+        if (await self.bot.is_owner(ctx.author)
             or ctx.channel.id in self.allowed_channels):
             if isinstance(error, CommandNotFound):
-                await ctx.send("That command didn't work. Please try `+help` for all available commands.")
+                await ctx.send((f"That command didn't work. "
+                    f"Please try `+help` for all available commands."))
             raise error
         else:
-            if isinstance(error, MissingRole) or isinstance(error, MissingAnyRole):
-                await ctx.send("You do not have permission to use that command here.")
+            if (isinstance(error, MissingRole)
+                or isinstance(error, MissingAnyRole)):
+                await ctx.send((f"You do not have permission to use that "
+                    f"command here."))
             raise error
 
     async def uptime(self):
@@ -106,9 +113,11 @@ class MyClient(commands.Bot):
         uptime %= 60
         seconds = uptime
         if days > 0:
-            return f"{int(days)} days, {int(hours)} hours, {int(minutes)} minutes, {int(seconds)} seconds"
+            return (f"{int(days)} days, {int(hours)} hours, "
+                f"{int(minutes)} minutes, {int(seconds)} seconds")
         else:
-            return f"{int(hours)} hours, {int(minutes)} minutes, {int(seconds)} seconds"
+            return (f"{int(hours)} hours, {int(minutes)} minutes, "
+                f"{int(seconds)} seconds")
 
     # Commands
     @commands.command(name="load", hidden=True)
