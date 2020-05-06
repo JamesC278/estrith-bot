@@ -46,7 +46,7 @@ class Core(commands.Cog):
         await ctx.send((f"<:online:705690474882793473> I've been hating my "
             f"life for: {await ctx.bot.uptime()}"))
 
-    @commands.command(name="mintime", hidden=True)
+    @commands.command(name="mintime", aliases=["set_min"], hidden=True)
     async def set_lower_boundary(
         self,
         ctx,
@@ -56,7 +56,7 @@ class Core(commands.Cog):
             self.bot.min_time = hours * 3600
             await ctx.send(f"{self.bot.min_time} seconds minimum")
 
-    @commands.command(name="maxtime", hidden=True)
+    @commands.command(name="maxtime", aliases=["set_max"], hidden=True)
     async def set_upper_boundary(
         self,
         ctx,
