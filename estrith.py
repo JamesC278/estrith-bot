@@ -33,7 +33,8 @@ class MyClient(commands.Bot):
         self.messages = [
             f"Yet another round with nothing interesting happening.",
             (f"Soon we'll be home eating red meat and combing innards "
-            f"from our hair.", "Time to do my rounds, I suppose."),
+            f"from our hair."),
+            f"Time to do my rounds, I suppose.",
             (f"If that smuggler is sneaking about again, I'll have his "
             f"head on a rusty pike."),
             (f"Hey you! I've got my eyes on you. "
