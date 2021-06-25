@@ -1,16 +1,22 @@
-import datetime, time, discord, asyncio, json, os, random
+import asyncio
+import datetime
+import json
+import os
+import random
+import time
 from itertools import cycle
+
+import discord
 from discord.ext import commands
-from discord.ext.commands import CommandNotFound, MissingRole, MissingAnyRole
+from discord.ext.commands import CommandNotFound, MissingAnyRole, MissingRole
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 token = open("data/token/token.txt", "r").readline()
 
-description = """
-I hate my life.
-"""
+description = ""
+
 
 class MyClient(commands.Bot):
     def __init__(self):
@@ -19,7 +25,7 @@ class MyClient(commands.Bot):
             command_prefix="+",
             case_insensitive=True,
             owner_id=154622682078380032,
-            description=description
+            description=description,
         )
         self.add_command(self.load_command)
         self.add_command(self.unload_command)
@@ -27,24 +33,36 @@ class MyClient(commands.Bot):
         # Set up attributes
         self.commands_used = 0
         self.start_time = time.time()
-        self.min_time = 7200
-        self.max_time = 86400
+        self.min_time = 599
+        self.max_time = 601
         self.recent = [0 for x in range(7)]
         self.messages = [
             f"Yet another round with nothing interesting happening.",
-            (f"Soon we'll be home eating red meat and combing innards "
-            f"from our hair."),
+            (
+                f"Soon we'll be home eating red meat and combing innards "
+                f"from our hair."
+            ),
             f"Time to do my rounds, I suppose.",
-            (f"If that smuggler is sneaking about again, I'll have his "
-            f"head on a rusty pike."),
-            (f"Hey you! I've got my eyes on you. "
-            f"You better not try any funny business around here."),
-            (f"Oh look! Some rocks! Oh, and some more rocks! "
-            f"It can't get more exciting than this."),
-            (f"I've got the eyes of a hawk, the ears of a wolf, "
-            f"the speed of a kyatt and an awful day job."),
-            (f"If I never see another floating eyeball in a hundred years, "
-            f"it'll be too soon.")
+            (
+                f"If that smuggler is sneaking about again, I'll have his "
+                f"head on a rusty pike."
+            ),
+            (
+                f"Hey you! I've got my eyes on you. "
+                f"You better not try any funny business around here."
+            ),
+            (
+                f"Oh look! Some rocks! Oh, and some more rocks! "
+                f"It can't get more exciting than this."
+            ),
+            (
+                f"I've got the eyes of a hawk, the ears of a wolf, "
+                f"the speed of a kyatt and an awful day job."
+            ),
+            (
+                f"If I never see another floating eyeball in a hundred years, "
+                f"it'll be too soon."
+            ),
         ]
         self.bg_task = self.loop.create_task(self.background_loop())
         # Load cogs
@@ -57,13 +75,16 @@ class MyClient(commands.Bot):
                 print(f"Failed to load extension {file}.")
 
     async def on_ready(self):
-        print((f"Online.\n"
-            f"Username: {self.user.name}\n"
-            f"ID: {self.user.id}\n{'-'*27}"))
+        print(
+            (
+                f"Online.\n"
+                f"Username: {self.user.name}\n"
+                f'ID: {self.user.id}\n{"-"*27}'
+            )
+        )
         await self.change_presence(
             activity=discord.Activity(
-                type=discord.ActivityType.watching,
-                name="for rusty pikes"
+                type=discord.ActivityType.watching, name="for rusty pikes"
             )
         )
 
@@ -73,17 +94,29 @@ class MyClient(commands.Bot):
             time = random.randint(self.min_time, self.max_time)
             m, s = divmod(time, 60)
             h, m = divmod(m, 60)
-            owner = self.get_user(self.owner_id)
-            await owner.send((f"Next message will be sent in:\n"
-                f"{h:d} hours, {m:02d} minutes, {s:02d} seconds"))
-            await asyncio.sleep(time)
-            channel = self.get_channel(683818756522115084)
             quote = random.choice(self.messages)
             while quote in self.recent:
                 quote = random.choice(self.messages)
             self.recent.pop(0)
             self.recent.append(quote)
-            await channel.send(quote)
+            guilds = self.guilds
+            required_perms = discord.Permissions(read_messages=True, send_messages=True)
+            for guild in guilds:
+                if guild.name == "KontulaMafia":
+                    channel = random.choice(guild.text_channels)
+                    while not channel.permissions_for(guild.me) >= required_perms:
+                        channel = random.choice(guild.text_channels)
+                    await channel.send(quote)
+                    print(f"Sent message to {guild} in #{channel}.")
+                if guild.name == "Damaged construct":
+                    channel = guild.get_channel(719649541682364527)
+                    await channel.send(quote)
+                    print(f"Sent message to {guild} in #{channel}.")
+            owner = (await self.application_info()).owner
+            await owner.send(
+                f"Next message will be sent in:\n {h:d} hours, {m:02d} minutes, {s:02d} seconds"
+            )
+            await asyncio.sleep(time)
 
     async def on_command(self, ctx):
         """Count number of commands used"""
@@ -91,17 +124,20 @@ class MyClient(commands.Bot):
 
     async def on_command_error(self, ctx, error):
         """Handle error on commands"""
-        if (await self.bot.is_owner(ctx.author)
-            or ctx.channel.id in self.allowed_channels):
+        if await self.is_owner(ctx.author) or ctx.channel.id in self.allowed_channels:
             if isinstance(error, CommandNotFound):
-                await ctx.send((f"That command didn't work. "
-                    f"Please try `+help` for all available commands."))
+                await ctx.send(
+                    (
+                        f"That command didn't work. "
+                        f"Please try `+help` for all available commands."
+                    )
+                )
             raise error
         else:
-            if (isinstance(error, MissingRole)
-                or isinstance(error, MissingAnyRole)):
-                await ctx.send((f"You do not have permission to use that "
-                    f"command here."))
+            if isinstance(error, MissingRole) or isinstance(error, MissingAnyRole):
+                await ctx.send(
+                    (f"You do not have permission to use that " f"command here.")
+                )
             raise error
 
     async def uptime(self):
@@ -114,11 +150,15 @@ class MyClient(commands.Bot):
         uptime %= 60
         seconds = uptime
         if days > 0:
-            return (f"{int(days)} days, {int(hours)} hours, "
-                f"{int(minutes)} minutes, {int(seconds)} seconds")
+            return (
+                f"{int(days)} days, {int(hours)} hours, "
+                f"{int(minutes)} minutes, {int(seconds)} seconds"
+            )
         else:
-            return (f"{int(hours)} hours, {int(minutes)} minutes, "
-                f"{int(seconds)} seconds")
+            return (
+                f"{int(hours)} hours, {int(minutes)} minutes, "
+                f"{int(seconds)} seconds"
+            )
 
     # Commands
     @commands.command(name="load", hidden=True)
@@ -168,6 +208,7 @@ class MyClient(commands.Bot):
                     await self.send(f"{e.__class__.__name__}: {e}")
                 else:
                     await self.send(":ok_hand:")
+
 
 if __name__ == "__main__":
     client = MyClient()
