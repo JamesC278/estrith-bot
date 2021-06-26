@@ -196,7 +196,6 @@ class MyClient(commands.Bot):
                             self.bot.load_extension(f"cogs.{file[:-3]}")
                             text += f"Loaded: {file}\n"
                     except Exception as e:
-                        print(e)
                         text += f"Failed to load extension {file}\n"
                 await self.send(text)
             else:
@@ -204,7 +203,6 @@ class MyClient(commands.Bot):
                     self.bot.unload_extension(f"cogs.{module}")
                     self.bot.load_extension(f"cogs.{module}")
                 except commands.ExtensionError as e:
-                    print(e)
                     await self.send(f"{e.__class__.__name__}: {e}")
                 else:
                     await self.send(":ok_hand:")
