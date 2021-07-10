@@ -15,7 +15,7 @@ dname = os.path.dirname(abspath)
 os.chdir(dname)
 token = open("data/token/token.txt", "r").readline()
 
-description = ""
+description = "She is finding it hard to hide her boredom."
 
 
 class MyClient(commands.Bot):
